@@ -3,7 +3,8 @@ package iris.collections
 import java.io.*
 import java.util.*
 import java.util.function.Consumer
-import java.util.function.Predicate
+import java.util.function.LongConsumer
+import java.util.function.LongPredicate
 import kotlin.math.max
 import kotlin.math.min
 
@@ -12,7 +13,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : PrimiveAbstractList<Long>() {
+class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongCollection, PrimiveAbstractList<Long>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
@@ -86,8 +87,6 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		}
 	}
 
-
-
 	private fun grow(): LongArray {
 		return grow(size + 1)
 	}
@@ -101,11 +100,11 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @param o element whose presence in this list is to be tested
 	 * @return `true` if this list contains the specified element
 	 */
-	operator fun contains(o: Long): Boolean {
+	override operator fun contains(o: Long): Boolean {
 		return indexOf(o) >= 0
 	}
 
-	fun containsAll(c: Collection<Long>): Boolean {
+	override fun containsAll(c: Collection<Long>): Boolean {
 		return c.all(::contains)
 	}
 
@@ -116,11 +115,11 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * `Objects.equals(o, get(i))`,
 	 * or -1 if there is no such index.
 	 */
-	fun indexOf(o: Long): Int {
+	override fun indexOf(o: Long): Int {
 		return indexOfRange(o, 0, size)
 	}
 
-	fun indexOfRange(o: Long, start: Int, end: Int): Int {
+	override fun indexOfRange(o: Long, start: Int, end: Int): Int {
 		val es = elementData
 		for (i in start until end) {
 			if (o == es[i]) {
@@ -137,11 +136,11 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * `Objects.equals(o, get(i))`,
 	 * or -1 if there is no such index.
 	 */
-	fun lastIndexOf(o: Long): Int {
+	override fun lastIndexOf(o: Long): Int {
 		return lastIndexOfRange(o, 0, size)
 	}
 
-	fun lastIndexOfRange(o: Long, start: Int, end: Int): Int {
+	override fun lastIndexOfRange(o: Long, start: Int, end: Int): Int {
 		val es = elementData
 		for (i in end - 1 downTo start) {
 			if (o == es[i]) {
@@ -177,7 +176,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @return an array containing all of the elements in this list in
 	 * proper sequence
 	 */
-	fun toArray(): LongArray {
+	override fun toArray(): LongArray {
 		return elementData.copyOf(size)
 	}
 
@@ -206,7 +205,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * this list
 	 * @throws NullPointerException if the specified array is null
 	 */
-	fun toArray(a: LongArray): LongArray {
+	override fun toArray(a: LongArray): LongArray {
 		return elementData.copyInto(a, 0, 0, min(a.size, size))
 	}
 
@@ -217,12 +216,12 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @return the element at the specified position in this list
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	operator fun get(index: Int): Long {
+	override operator fun get(index: Int): Long {
 		Objects.checkIndex(index, size)
 		return elementData[index]
 	}
 
-	fun elementAt(index: Int) = get(index)
+	override fun elementAt(index: Int) = get(index)
 
 	private fun elementAt(elementData: LongArray, index: Int): Long {
 		Objects.checkIndex(index, size)
@@ -238,7 +237,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @return the element previously at the specified position
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	operator fun set(index: Int, element: Long) {
+	override operator fun set(index: Int, element: Long) {
 		Objects.checkIndex(index, size)
 		elementData[index] = element
 	}
@@ -261,13 +260,13 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @param e element to be appended to this list
 	 * @return `true` (as specified by [Collection.add])
 	 */
-	fun add(e: Long) {
+	override fun add(e: Long) {
 		if (size == elementData.size)
 			elementData = grow()
 		elementData[size++] = e
 	}
 
-	operator fun plusAssign(e: Long) = add(e)
+	override operator fun plusAssign(e: Long) = add(e)
 
 
 	/**
@@ -279,7 +278,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * @return the element that was removed from the list
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	fun removeAt(index: Int): Long {
+	override fun removeAt(index: Int): Long {
 		Objects.checkIndex(index, size)
 		val es = elementData
 		val oldValue = es[index]
@@ -287,11 +286,11 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return oldValue
 	}
 
-	fun fastRemoveAt(index: Int) {
+	override fun fastRemoveAt(index: Int) {
 		fastRemove(elementData, index)
 	}
 
-	fun equalsRange(other: LongArrayList, from: Int, to: Int): Boolean {
+	override fun equalsRange(other: LongCollection, from: Int, to: Int): Boolean {
 		var from = from
 		val es = elementData
 		val oit = other.iterator()
@@ -317,7 +316,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return true
 	}
 
-	fun hashCodeRange(from: Int, to: Int): Int {
+	private fun hashCodeRange(from: Int, to: Int): Int {
 		val es = elementData
 		var hashCode = 1
 		for (i in from until to) {
@@ -349,7 +348,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		addAll(c)
 	}
 
-	fun addAll(c: Collection<Long>) {
+	override fun addAll(c: Collection<Long>) {
 		val a = c.toLongArray()
 		val numNew = a.size
 		if (numNew == 0) return
@@ -367,6 +366,19 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 
 	operator fun plusAssign(c: LongArrayList) {
 		addAll(c)
+	}
+
+	override operator fun plusAssign(c: LongCollection) {
+		addAll(c)
+	}
+
+	override fun addAll(c: LongCollection) {
+		if (c is LongArrayList) {
+			addAll(c)
+			return
+		}
+		ensureCapacity(size + c.size)
+		TODO()
 	}
 
 	fun addAll(c: LongArrayList) {
@@ -388,7 +400,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		addAll(c)
 	}
 
-	fun addAll(c: LongArray) {
+	override fun addAll(c: LongArray) {
 		val a: LongArray = c
 		val numNew = c.size
 		if (numNew == 0) return
@@ -499,19 +511,19 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 *
 	 * @return an iterator over the elements in this list in proper sequence
 	 */
-	fun iterator(): LongIterator {
-		return LongIterator()
+	override fun iterator(): LongArrayIterator {
+		return LongArrayIterator()
 	}
 
-	inner class LongIterator {
+	inner class LongArrayIterator : LongCollection.LongIterator {
 		var cursor = 0
 		var lastRet = -1
 
-		fun hasNext(): Boolean {
+		override fun hasNext(): Boolean {
 			return cursor != size
 		}
 
-		fun next(): Long {
+		override fun next(): Long {
 			val i = cursor
 			if (i >= size) throw NoSuchElementException()
 			val elementData: LongArray = this@LongArrayList.elementData
@@ -520,7 +532,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 			return elementData[i.also { lastRet = it }]
 		}
 
-		fun remove() {
+		override fun remove() {
 			check(lastRet >= 0)
 			try {
 				this@LongArrayList.removeAt(lastRet)
@@ -531,7 +543,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 			}
 		}
 
-		fun forEachRemaining(action: Consumer<in Long>) {
+		override fun forEachRemaining(action: LongConsumer) {
 			Objects.requireNonNull(action)
 			val size: Int = this@LongArrayList.size
 			var i = cursor
@@ -602,7 +614,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	/**
 	 * @throws NullPointerException {@inheritDoc}
 	 */
-	fun forEach(action: (e: Long) -> Unit) {
+	override fun forEach(action: (e: Long) -> Unit) {
 		val es = elementData
 		val size = size
 		var i = 0
@@ -612,7 +624,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		}
 	}
 
-	fun forEachIndexed(action: (index: Int, e: Long) -> Unit) {
+	override fun forEachIndexed(action: (index: Int, e: Long) -> Unit) {
 		val es = elementData
 		val size = size
 		var i = 0
@@ -638,7 +650,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	/**
 	 * @throws NullPointerException {@inheritDoc}
 	 */
-	fun removeIf(filter: Predicate<Long>): Boolean {
+	override fun removeIf(filter: LongPredicate): Boolean {
 		return removeIf(filter, 0, size)
 	}
 
@@ -646,7 +658,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	 * Removes all elements satisfying the given predicate, from index
 	 * i (inclusive) to index end (exclusive).
 	 */
-	fun removeIf(filter: Predicate<Long>, i: Int, end: Int): Boolean {
+	override fun removeIf(filter: LongPredicate, i: Int, end: Int): Boolean {
 		var i = i
 		Objects.requireNonNull(filter)
 		val es = elementData

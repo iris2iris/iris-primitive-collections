@@ -20,6 +20,8 @@ abstract class PrimiveAbstractList<E> {
 		return size == 0
 	}
 
+	fun isNotEmpty() = !isEmpty()
+
 	abstract fun trimToSize()
 	abstract fun ensureCapacity(minCapacity: Int)
 	abstract fun clone(): PrimiveAbstractList<E>

@@ -41,7 +41,5 @@ object IntTest {
 		arr.forEachIndexed { i, el ->
 			println("$i: $el")
 		}
-
-
 	}
 }

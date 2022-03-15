@@ -3,6 +3,8 @@ package iris.collections
 import java.io.*
 import java.util.*
 import java.util.function.Consumer
+import java.util.function.IntConsumer
+import java.util.function.IntPredicate
 import java.util.function.Predicate
 import kotlin.math.max
 import kotlin.math.min
@@ -12,7 +14,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : PrimiveAbstractList<Int>() {
+class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntCollection, PrimiveAbstractList<Int>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
@@ -86,8 +88,6 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		}
 	}
 
-
-
 	private fun grow(): IntArray {
 		return grow(size + 1)
 	}
@@ -101,11 +101,11 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @param o element whose presence in this list is to be tested
 	 * @return `true` if this list contains the specified element
 	 */
-	operator fun contains(o: Int): Boolean {
+	override operator fun contains(o: Int): Boolean {
 		return indexOf(o) >= 0
 	}
 
-	fun containsAll(c: Collection<Int>): Boolean {
+	override fun containsAll(c: Collection<Int>): Boolean {
 		return c.all(::contains)
 	}
 
@@ -116,11 +116,11 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * `Objects.equals(o, get(i))`,
 	 * or -1 if there is no such index.
 	 */
-	fun indexOf(o: Int): Int {
+	override fun indexOf(o: Int): Int {
 		return indexOfRange(o, 0, size)
 	}
 
-	fun indexOfRange(o: Int, start: Int, end: Int): Int {
+	override fun indexOfRange(o: Int, start: Int, end: Int): Int {
 		val es = elementData
 		for (i in start until end) {
 			if (o == es[i]) {
@@ -137,11 +137,11 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * `Objects.equals(o, get(i))`,
 	 * or -1 if there is no such index.
 	 */
-	fun lastIndexOf(o: Int): Int {
+	override fun lastIndexOf(o: Int): Int {
 		return lastIndexOfRange(o, 0, size)
 	}
 
-	fun lastIndexOfRange(o: Int, start: Int, end: Int): Int {
+	override fun lastIndexOfRange(o: Int, start: Int, end: Int): Int {
 		val es = elementData
 		for (i in end - 1 downTo start) {
 			if (o == es[i]) {
@@ -177,7 +177,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @return an array containing all of the elements in this list in
 	 * proper sequence
 	 */
-	fun toArray(): IntArray {
+	override fun toArray(): IntArray {
 		return elementData.copyOf(size)
 	}
 
@@ -206,7 +206,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * this list
 	 * @throws NullPointerException if the specified array is null
 	 */
-	fun toArray(a: IntArray): IntArray {
+	override fun toArray(a: IntArray): IntArray {
 		return elementData.copyInto(a, 0, 0, min(a.size, size))
 	}
 
@@ -217,12 +217,12 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @return the element at the specified position in this list
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	operator fun get(index: Int): Int {
+	override operator fun get(index: Int): Int {
 		Objects.checkIndex(index, size)
 		return elementData[index]
 	}
 
-	fun elementAt(index: Int) = get(index)
+	override fun elementAt(index: Int) = get(index)
 
 	private fun elementAt(elementData: IntArray, index: Int): Int {
 		Objects.checkIndex(index, size)
@@ -238,7 +238,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @return the element previously at the specified position
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	operator fun set(index: Int, element: Int) {
+	override operator fun set(index: Int, element: Int) {
 		Objects.checkIndex(index, size)
 		elementData[index] = element
 	}
@@ -261,13 +261,13 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @param e element to be appended to this list
 	 * @return `true` (as specified by [Collection.add])
 	 */
-	fun add(e: Int) {
+	override fun add(e: Int) {
 		if (size == elementData.size)
 			elementData = grow()
 		elementData[size++] = e
 	}
 
-	operator fun plusAssign(e: Int) = add(e)
+	override operator fun plusAssign(e: Int) = add(e)
 
 
 	/**
@@ -279,7 +279,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * @return the element that was removed from the list
 	 * @throws IndexOutOfBoundsException {@inheritDoc}
 	 */
-	fun removeAt(index: Int): Int {
+	override fun removeAt(index: Int): Int {
 		Objects.checkIndex(index, size)
 		val es = elementData
 		val oldValue = es[index]
@@ -287,11 +287,11 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		return oldValue
 	}
 
-	fun fastRemoveAt(index: Int) {
+	override fun fastRemoveAt(index: Int) {
 		fastRemove(elementData, index)
 	}
 
-	fun equalsRange(other: IntArrayList, from: Int, to: Int): Boolean {
+	override fun equalsRange(other: IntCollection, from: Int, to: Int): Boolean {
 		var from = from
 		val es = elementData
 		val oit = other.iterator()
@@ -317,7 +317,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		return true
 	}
 
-	fun hashCodeRange(from: Int, to: Int): Int {
+	private fun hashCodeRange(from: Int, to: Int): Int {
 		val es = elementData
 		var hashCode = 1
 		for (i in from until to) {
@@ -349,7 +349,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		addAll(c)
 	}
 
-	fun addAll(c: Collection<Int>) {
+	override fun addAll(c: Collection<Int>) {
 		val a = c.toIntArray()
 		val numNew = a.size
 		if (numNew == 0) return
@@ -367,6 +367,19 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 
 	operator fun plusAssign(c: IntArrayList) {
 		addAll(c)
+	}
+
+	override operator fun plusAssign(c: IntCollection) {
+		addAll(c)
+	}
+
+	override fun addAll(c: IntCollection) {
+		if (c is IntArrayList) {
+			addAll(c)
+			return
+		}
+		ensureCapacity(size + c.size)
+		TODO()
 	}
 
 	fun addAll(c: IntArrayList) {
@@ -388,7 +401,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		addAll(c)
 	}
 
-	fun addAll(c: IntArray) {
+	override fun addAll(c: IntArray) {
 		val a: IntArray = c
 		val numNew = c.size
 		if (numNew == 0) return
@@ -499,19 +512,19 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 *
 	 * @return an iterator over the elements in this list in proper sequence
 	 */
-	fun iterator(): IntIterator {
-		return IntIterator()
+	override fun iterator(): IntArrayIterator {
+		return IntArrayIterator()
 	}
 
-	inner class IntIterator {
+	inner class IntArrayIterator : IntCollection.IntIterator {
 		var cursor = 0
 		var lastRet = -1
 
-		fun hasNext(): Boolean {
+		override fun hasNext(): Boolean {
 			return cursor != size
 		}
 
-		fun next(): Int {
+		override fun next(): Int {
 			val i = cursor
 			if (i >= size) throw NoSuchElementException()
 			val elementData: IntArray = this@IntArrayList.elementData
@@ -520,7 +533,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 			return elementData[i.also { lastRet = it }]
 		}
 
-		fun remove() {
+		override fun remove() {
 			check(lastRet >= 0)
 			try {
 				this@IntArrayList.removeAt(lastRet)
@@ -531,7 +544,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 			}
 		}
 
-		fun forEachRemaining(action: Consumer<in Int>) {
+		override fun forEachRemaining(action: IntConsumer) {
 			Objects.requireNonNull(action)
 			val size: Int = this@IntArrayList.size
 			var i = cursor
@@ -602,7 +615,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	/**
 	 * @throws NullPointerException {@inheritDoc}
 	 */
-	fun forEach(action: (e: Int) -> Unit) {
+	override fun forEach(action: (e: Int) -> Unit) {
 		val es = elementData
 		val size = size
 		var i = 0
@@ -612,7 +625,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		}
 	}
 
-	fun forEachIndexed(action: (index: Int, e: Int) -> Unit) {
+	override fun forEachIndexed(action: (index: Int, e: Int) -> Unit) {
 		val es = elementData
 		val size = size
 		var i = 0
@@ -638,7 +651,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	/**
 	 * @throws NullPointerException {@inheritDoc}
 	 */
-	fun removeIf(filter: Predicate<Int>): Boolean {
+	override fun removeIf(filter: IntPredicate): Boolean {
 		return removeIf(filter, 0, size)
 	}
 
@@ -646,7 +659,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 * Removes all elements satisfying the given predicate, from index
 	 * i (inclusive) to index end (exclusive).
 	 */
-	fun removeIf(filter: Predicate<Int>, i: Int, end: Int): Boolean {
+	override fun removeIf(filter: IntPredicate, i: Int, end: Int): Boolean {
 		var i = i
 		Objects.requireNonNull(filter)
 		val es = elementData
