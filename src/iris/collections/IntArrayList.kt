@@ -505,14 +505,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	private fun outOfBoundsMsg(fromIndex: Int, toIndex: Int): String {
 		return "From Index: $fromIndex > To Index: $toIndex"
 	}
-	/**
-	 * Returns an iterator over the elements in this list in proper sequence.
-	 *
-	 *
-	 * The returned iterator is [*fail-fast*](#fail-fast).
-	 *
-	 * @return an iterator over the elements in this list in proper sequence
-	 */
+
 	override fun iterator(): IntArrayIterator {
 		return IntArrayIterator()
 	}
