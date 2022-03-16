@@ -11,4 +11,6 @@ interface PrimitiveCollection<E> {
 	fun clone(): PrimitiveCollection<E>
 	fun clear()
 	fun asGeneric(): MutableCollection<E>
+	fun containsAll(c: Collection<E>): Boolean
+	fun addAll(c: Collection<E>)
 }

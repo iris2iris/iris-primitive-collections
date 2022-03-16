@@ -9,7 +9,7 @@ import java.util.function.IntPredicate
  */
 interface IntCollection : PrimitiveCollection<Int> {
 	fun contains(o: Int): Boolean
-	fun containsAll(c: Collection<Int>): Boolean
+
 	fun indexOf(o: Int): Int
 	fun indexOfRange(o: Int, start: Int, end: Int): Int
 	fun lastIndexOf(o: Int): Int
@@ -24,7 +24,7 @@ interface IntCollection : PrimitiveCollection<Int> {
 	fun removeAt(index: Int): Int
 	fun fastRemoveAt(index: Int)
 	fun equalsRange(other: IntCollection, from: Int, to: Int): Boolean
-	fun addAll(c: Collection<Int>)
+
 	operator fun plusAssign(c: IntCollection)
 	fun addAll(c: IntCollection)
 	fun addAll(c: IntArray)

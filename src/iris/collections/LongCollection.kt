@@ -9,7 +9,6 @@ import java.util.function.LongPredicate
  */
 interface LongCollection : PrimitiveCollection<Long> {
 	fun contains(o: Long): Boolean
-	fun containsAll(c: Collection<Long>): Boolean
 	fun indexOf(o: Long): Int
 	fun indexOfRange(o: Long, start: Int, end: Int): Int
 	fun lastIndexOf(o: Long): Int
@@ -24,7 +23,6 @@ interface LongCollection : PrimitiveCollection<Long> {
 	fun removeAt(index: Int): Long
 	fun fastRemoveAt(index: Int)
 	fun equalsRange(other: LongCollection, from: Int, to: Int): Boolean
-	fun addAll(c: Collection<Long>)
 	operator fun plusAssign(c: LongCollection)
 	fun addAll(c: LongCollection)
 	fun addAll(c: LongArray)
