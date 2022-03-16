@@ -1,6 +1,5 @@
 package iris.collections
 
-import java.lang.Appendable
 import java.util.function.IntConsumer
 import java.util.function.IntPredicate
 
@@ -56,3 +55,4 @@ interface IntCollection : PrimitiveCollection<Int> {
 		override fun invoke(el: Int, sb: StringBuilder) = invoke(el, sb as Appendable)
 	}
 }
+

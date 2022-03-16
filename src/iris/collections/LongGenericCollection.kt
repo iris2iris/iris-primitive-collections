@@ -1,6 +1,6 @@
 package iris.collections
 
-class LongGenericCollection(private val collection: LongCollection) : MutableCollection<Long> {
+open class LongGenericCollection(protected val collection: LongCollection) : MutableCollection<Long> {
 	override val size: Int
 		get() = collection.size
 

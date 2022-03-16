@@ -14,7 +14,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntCollection, PrimitiveAbstractList<Int>() {
+class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntList, PrimitiveAbstractList<Int>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
@@ -705,8 +705,8 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		return joinToString(limit = 100, prefix = "[", postfix = "]")
 	}
 
-	override fun asGeneric(): IntGenericCollection {
-		return IntGenericCollection(this)
+	override fun asGeneric(): IntGenericList {
+		return IntGenericList(this)
 	}
 
 	override fun genericIterator(): MutableIterator<Int> {

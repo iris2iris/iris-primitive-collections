@@ -14,7 +14,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongCollection, PrimitiveAbstractList<Long>() {
+class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongList, PrimitiveAbstractList<Long>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
@@ -712,8 +712,8 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return joinToString(limit = 100, prefix = "[", postfix = "]")
 	}
 
-	override fun asGeneric(): LongGenericCollection {
-		return LongGenericCollection(this)
+	override fun asGeneric(): LongGenericList {
+		return LongGenericList(this)
 	}
 
 	override fun genericIterator(): MutableIterator<Long> {

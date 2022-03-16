@@ -2,7 +2,7 @@ package iris.collections
 
 import java.lang.Appendable
 
-class IntGenericCollection(private val collection: IntCollection) : MutableCollection<Int> {
+open class IntGenericCollection(protected val collection: IntCollection) : MutableCollection<Int> {
 	override val size: Int
 		get() = collection.size
 
