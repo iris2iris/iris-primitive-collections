@@ -6,8 +6,7 @@ import kotlin.math.max
  * @created 15.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
-abstract class PrimiveAbstractList<E> {
-	abstract val size: Int
+abstract class PrimiveAbstractList<E> : PrimitiveCollection<E> {
 
 	val lastIndex: Int get() = size - 1
 
@@ -16,17 +15,14 @@ abstract class PrimiveAbstractList<E> {
 	 *
 	 * @return `true` if this list contains no elements
 	 */
-	fun isEmpty(): Boolean {
+	override fun isEmpty(): Boolean {
 		return size == 0
 	}
 
-	fun isNotEmpty() = !isEmpty()
+	override fun isNotEmpty() = !isEmpty()
 
 	abstract fun trimToSize()
 	abstract fun ensureCapacity(minCapacity: Int)
-	abstract fun clone(): PrimiveAbstractList<E>
-	abstract fun clear()
-	abstract fun asCollection(): MutableCollection<E>
 
 	protected fun newLength(oldLength: Int, minGrowth: Int, prefGrowth: Int): Int {
 		val newLength = max(minGrowth, prefGrowth) + oldLength

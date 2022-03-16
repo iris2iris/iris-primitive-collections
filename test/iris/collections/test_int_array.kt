@@ -1,7 +1,5 @@
 package iris.collections
 
-import java.util.ArrayList
-
 /**
  * @created 15.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
@@ -32,7 +30,7 @@ object IntTest {
 	fun mapTo() {
 		val dd = ArrayList<Int>().also { repeat(10) { i -> it += -i } }
 		val arr = IntArrayList()
-		dd.mapTo(arr.asCollection()) { it }
+		dd.mapTo(arr.asGeneric()) { it }
 		println(arr)
 		arr.forEach {
 			println(it)

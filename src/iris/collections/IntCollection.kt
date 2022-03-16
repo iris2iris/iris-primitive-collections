@@ -7,16 +7,13 @@ import java.util.function.IntPredicate
  * @created 16.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
-interface IntCollection {
-	val size: Int
+interface IntCollection : PrimitiveCollection<Int> {
 	fun contains(o: Int): Boolean
 	fun containsAll(c: Collection<Int>): Boolean
 	fun indexOf(o: Int): Int
 	fun indexOfRange(o: Int, start: Int, end: Int): Int
 	fun lastIndexOf(o: Int): Int
 	fun lastIndexOfRange(o: Int, start: Int, end: Int): Int
-	fun clone(): IntCollection
-	fun clear()
 	fun toArray(): IntArray
 	fun toArray(a: IntArray): IntArray
 	operator fun get(index: Int): Int
@@ -27,7 +24,6 @@ interface IntCollection {
 	fun removeAt(index: Int): Int
 	fun fastRemoveAt(index: Int)
 	fun equalsRange(other: IntCollection, from: Int, to: Int): Boolean
-	fun asCollection(): MutableCollection<Int>
 	fun addAll(c: Collection<Int>)
 	operator fun plusAssign(c: IntCollection)
 	fun addAll(c: IntCollection)

@@ -5,7 +5,6 @@ import java.util.*
 import java.util.function.Consumer
 import java.util.function.IntConsumer
 import java.util.function.IntPredicate
-import java.util.function.Predicate
 import kotlin.math.max
 import kotlin.math.min
 
@@ -379,7 +378,9 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 			return
 		}
 		ensureCapacity(size + c.size)
-		TODO()
+		val itr = c.iterator()
+		while (itr.hasNext())
+			add(itr.next())
 	}
 
 	fun addAll(c: IntArrayList) {
@@ -771,7 +772,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		}
 	}
 
-	override fun asCollection(): MutableCollection<Int> {
+	override fun asGeneric(): MutableCollection<Int> {
 		return Generic()
 	}
 

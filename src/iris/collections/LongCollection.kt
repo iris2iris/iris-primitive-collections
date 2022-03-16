@@ -1,24 +1,19 @@
 package iris.collections
 
-import java.util.function.Consumer
 import java.util.function.LongConsumer
 import java.util.function.LongPredicate
-import java.util.function.Predicate
 
 /**
  * @created 16.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
-interface LongCollection {
-	val size: Int
+interface LongCollection : PrimitiveCollection<Long> {
 	fun contains(o: Long): Boolean
 	fun containsAll(c: Collection<Long>): Boolean
 	fun indexOf(o: Long): Int
 	fun indexOfRange(o: Long, start: Int, end: Int): Int
 	fun lastIndexOf(o: Long): Int
 	fun lastIndexOfRange(o: Long, start: Int, end: Int): Int
-	fun clone(): LongCollection
-	fun clear()
 	fun toArray(): LongArray
 	fun toArray(a: LongArray): LongArray
 	operator fun get(index: Int): Long
@@ -29,7 +24,6 @@ interface LongCollection {
 	fun removeAt(index: Int): Long
 	fun fastRemoveAt(index: Int)
 	fun equalsRange(other: LongCollection, from: Int, to: Int): Boolean
-	fun asCollection(): MutableCollection<Long>
 	fun addAll(c: Collection<Long>)
 	operator fun plusAssign(c: LongCollection)
 	fun addAll(c: LongCollection)

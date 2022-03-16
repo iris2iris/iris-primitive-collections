@@ -378,7 +378,9 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 			return
 		}
 		ensureCapacity(size + c.size)
-		TODO()
+		val itr = c.iterator()
+		while (itr.hasNext())
+			add(itr.next())
 	}
 
 	fun addAll(c: LongArrayList) {
@@ -770,7 +772,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		}
 	}
 
-	override fun asCollection(): MutableCollection<Long> {
+	override fun asGeneric(): MutableCollection<Long> {
 		return Generic()
 	}
 
