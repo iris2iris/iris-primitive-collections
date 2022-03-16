@@ -8,6 +8,7 @@ package iris.collections
 object IntTest {
 	@JvmStatic
 	fun main(args: Array<String>) {
+		test()
 		mapTo()
 	}
 

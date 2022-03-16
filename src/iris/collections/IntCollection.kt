@@ -1,5 +1,6 @@
 package iris.collections
 
+import java.lang.Appendable
 import java.util.function.IntConsumer
 import java.util.function.IntPredicate
 
@@ -41,4 +42,17 @@ interface IntCollection : PrimitiveCollection<Int> {
 	fun forEach(action: (e: Int) -> Unit)
 	fun removeIf(filter: IntPredicate, i: Int, end: Int): Boolean
 	fun removeIf(filter: IntPredicate): Boolean
+
+	fun joinToString(separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: IntTransform? = null): String
+	fun joinTo(buffer: StringBuilder, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: IntTransform? = null): StringBuilder
+	fun <A: Appendable>joinTo(buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: IntTransform? = null): A
+
+	interface IntTransform {
+		fun invoke(el: Int, sb: Appendable)
+		fun invoke(el: Int, sb: StringBuilder)
+	}
+
+	abstract class IntTransformAbstract : IntTransform {
+		override fun invoke(el: Int, sb: StringBuilder) = invoke(el, sb as Appendable)
+	}
 }

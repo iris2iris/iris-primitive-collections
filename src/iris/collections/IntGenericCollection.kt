@@ -1,5 +1,7 @@
 package iris.collections
 
+import java.lang.Appendable
+
 class IntGenericCollection(private val collection: IntCollection) : MutableCollection<Int> {
 	override val size: Int
 		get() = collection.size
@@ -47,5 +49,13 @@ class IntGenericCollection(private val collection: IntCollection) : MutableColle
 
 	override fun retainAll(elements: Collection<Int>): Boolean {
 		TODO("Not yet implemented")
+	}
+
+	fun joinToString(separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: IntCollection.IntTransform? = null): String {
+		return collection.joinToString(separator, prefix, postfix, limit, truncated, transform)
+	}
+
+	fun <A: Appendable>joinTo(buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: IntCollection.IntTransform? = null): A {
+		return collection.joinTo(buffer, separator, prefix, postfix, limit, truncated, transform)
 	}
 }

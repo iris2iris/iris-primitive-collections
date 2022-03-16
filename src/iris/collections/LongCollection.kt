@@ -1,5 +1,6 @@
 package iris.collections
 
+import java.lang.Appendable
 import java.util.function.LongConsumer
 import java.util.function.LongPredicate
 
@@ -39,4 +40,17 @@ interface LongCollection : PrimitiveCollection<Long> {
 	fun forEach(action: (e: Long) -> Unit)
 	fun removeIf(filter: LongPredicate, i: Int, end: Int): Boolean
 	fun removeIf(filter: LongPredicate): Boolean
+
+	fun joinToString(separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: LongTransform? = null): String
+	fun joinTo(buffer: StringBuilder, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: LongTransform? = null): StringBuilder
+	fun <A: Appendable>joinTo(buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: LongTransform? = null): A
+
+	interface LongTransform {
+		fun invoke(el: Long, sb: Appendable)
+		fun invoke(el: Long, sb: StringBuilder)
+	}
+
+	abstract class LongTransformAbstract : LongTransform {
+		override fun invoke(el: Long, sb: StringBuilder) = invoke(el, sb as Appendable)
+	}
 }

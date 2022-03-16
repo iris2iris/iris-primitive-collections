@@ -1,6 +1,7 @@
 package iris.collections
 
 import java.io.*
+import java.lang.Appendable
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.LongConsumer
@@ -708,18 +709,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	}
 
 	override fun toString(): String {
-		if (isEmpty()) return "[]"
-		val sb = StringBuilder(size*5)
-		sb.append('[')
-		for (i in 0 until min(100, size))
-			sb.append(elementData[i]).append(", ")
-		if (size > 100)
-			sb.append("...]")
-		else {
-			sb[sb.length - 2] = ']'
-			sb.setLength(sb.length - 1)
-		}
-		return sb.toString()
+		return joinToString(limit = 100, prefix = "[", postfix = "]")
 	}
 
 	override fun asGeneric(): LongGenericCollection {
@@ -728,6 +718,57 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 
 	override fun genericIterator(): MutableIterator<Long> {
 		return Itr()
+	}
+
+	override fun joinToString(separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): String {
+		return joinTo(StringBuilder(), separator, prefix, postfix, limit, truncated, transform).toString()
+	}
+
+	override fun <A: Appendable>joinTo(buffer: A, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): A {
+		if (buffer is StringBuilder)
+			return joinTo(buffer, separator, prefix, postfix, limit, truncated, transform) as A
+
+		buffer.append(prefix)
+		var count = 0
+		for (i in 0 until size) {
+			val element = elementData[i]
+			if (++count > 1) buffer.append(separator)
+			if (limit < 0 || count <= limit) {
+				appendElement(buffer, element, transform)
+			} else break
+		}
+		if (limit >= 0 && count > limit) buffer.append(truncated)
+		buffer.append(postfix)
+		return buffer
+	}
+
+	override fun joinTo(buffer: StringBuilder, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): StringBuilder {
+		buffer.append(prefix)
+		var count = 0
+		for (i in 0 until size) {
+			val element = elementData[i]
+			if (++count > 1) buffer.append(separator)
+			if (limit < 0 || count <= limit) {
+				appendElement(buffer, element, transform)
+			} else break
+		}
+		if (limit >= 0 && count > limit) buffer.append(truncated)
+		buffer.append(postfix)
+		return buffer
+	}
+
+	private fun appendElement(buffer: StringBuilder, element: Long, transform: LongCollection.LongTransform?) {
+		when (transform) {
+			null -> buffer.append(element)
+			else -> transform.invoke(element, buffer)
+		}
+	}
+
+	private fun appendElement(buffer: Appendable, element: Long, transform: LongCollection.LongTransform?) {
+		when (transform) {
+			null -> buffer.append(element.toString())
+			else -> transform.invoke(element, buffer)
+		}
 	}
 }
 
