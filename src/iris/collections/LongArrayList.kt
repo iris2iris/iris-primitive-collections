@@ -722,61 +722,12 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return sb.toString()
 	}
 
-	private inner class Generic : MutableCollection<Long> {
-		override val size: Int
-			get() = this@LongArrayList.size
-
-		override fun contains(element: Long): Boolean {
-			return this@LongArrayList.contains(element)
-		}
-
-		override fun containsAll(elements: Collection<Long>): Boolean {
-			return this@LongArrayList.containsAll(elements)
-		}
-
-		override fun isEmpty(): Boolean {
-			return this@LongArrayList.isEmpty()
-		}
-
-		override fun add(element: Long): Boolean {
-			this@LongArrayList.add(element)
-			return true
-		}
-
-		override fun addAll(elements: Collection<Long>): Boolean {
-			this@LongArrayList.addAll(elements)
-			return true
-		}
-
-		override fun clear() {
-			this@LongArrayList.clear()
-		}
-
-		override fun iterator(): MutableIterator<Long> {
-			return Itr()
-		}
-
-		override fun remove(element: Long): Boolean {
-			val ind = this@LongArrayList.indexOf(element)
-			if (ind == -1) return false
-			this@LongArrayList.removeAt(ind)
-			return true
-		}
-
-		override fun removeAll(elements: Collection<Long>): Boolean {
-			TODO("Not yet implemented")
-		}
-
-		override fun retainAll(elements: Collection<Long>): Boolean {
-			TODO("Not yet implemented")
-		}
+	override fun asGeneric(): LongGenericCollection {
+		return LongGenericCollection(this)
 	}
 
-	override fun asGeneric(): MutableCollection<Long> {
-		return Generic()
-	}
-
-	fun genericIterator(): Iterator<Long> {
+	override fun genericIterator(): MutableIterator<Long> {
 		return Itr()
 	}
 }
+

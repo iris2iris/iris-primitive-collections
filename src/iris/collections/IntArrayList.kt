@@ -715,61 +715,12 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		return sb.toString()
 	}
 
-	private inner class Generic : MutableCollection<Int> {
-		override val size: Int
-			get() = this@IntArrayList.size
-
-		override fun contains(element: Int): Boolean {
-			return this@IntArrayList.contains(element)
-		}
-
-		override fun containsAll(elements: Collection<Int>): Boolean {
-			return this@IntArrayList.containsAll(elements)
-		}
-
-		override fun isEmpty(): Boolean {
-			return this@IntArrayList.isEmpty()
-		}
-
-		override fun add(element: Int): Boolean {
-			this@IntArrayList.add(element)
-			return true
-		}
-
-		override fun addAll(elements: Collection<Int>): Boolean {
-			this@IntArrayList.addAll(elements)
-			return true
-		}
-
-		override fun clear() {
-			this@IntArrayList.clear()
-		}
-
-		override fun iterator(): MutableIterator<Int> {
-			return Itr()
-		}
-
-		override fun remove(element: Int): Boolean {
-			val ind = this@IntArrayList.indexOf(element)
-			if (ind == -1) return false
-			this@IntArrayList.removeAt(ind)
-			return true
-		}
-
-		override fun removeAll(elements: Collection<Int>): Boolean {
-			TODO("Not yet implemented")
-		}
-
-		override fun retainAll(elements: Collection<Int>): Boolean {
-			TODO("Not yet implemented")
-		}
+	override fun asGeneric(): IntGenericCollection {
+		return IntGenericCollection(this)
 	}
 
-	override fun asGeneric(): MutableCollection<Int> {
-		return Generic()
-	}
-
-	fun genericIterator(): Iterator<Int> {
+	override fun genericIterator(): MutableIterator<Int> {
 		return Itr()
 	}
 }
+
