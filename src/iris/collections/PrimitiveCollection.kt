@@ -13,4 +13,5 @@ interface PrimitiveCollection<E> {
 	fun asGeneric(): MutableCollection<E>
 	fun containsAll(c: Collection<E>): Boolean
 	fun addAll(c: Collection<E>)
+	fun genericIterator(): MutableIterator<E>
 }
