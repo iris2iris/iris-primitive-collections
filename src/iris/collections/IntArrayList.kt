@@ -13,7 +13,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntCollection, PrimiveAbstractList<Int>() {
+class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntCollection, PrimitiveAbstractList<Int>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10

@@ -13,7 +13,7 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongCollection, PrimiveAbstractList<Long>() {
+class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongCollection, PrimitiveAbstractList<Long>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10

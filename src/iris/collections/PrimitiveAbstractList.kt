@@ -6,15 +6,10 @@ import kotlin.math.max
  * @created 15.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
-abstract class PrimiveAbstractList<E> : PrimitiveCollection<E> {
+abstract class PrimitiveAbstractList<E> : PrimitiveCollection<E> {
 
 	val lastIndex: Int get() = size - 1
 
-	/**
-	 * Returns `true` if this list contains no elements.
-	 *
-	 * @return `true` if this list contains no elements
-	 */
 	override fun isEmpty(): Boolean {
 		return size == 0
 	}
