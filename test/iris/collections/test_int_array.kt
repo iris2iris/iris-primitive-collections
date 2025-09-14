@@ -35,10 +35,12 @@ object IntTest {
 		println(arr)
 		arr.forEach {
 			println(it)
+			true
 		}
 
 		arr.forEachIndexed { i, el ->
 			println("$i: $el")
+			true
 		}
 	}
 }

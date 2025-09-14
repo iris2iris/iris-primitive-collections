@@ -12,6 +12,10 @@ interface PrimitiveCollection<E> {
 	fun clear()
 	fun asGeneric(): MutableCollection<E>
 	fun containsAll(c: Collection<E>): Boolean
+	fun containsAny(c: Collection<E>): Boolean
 	fun addAll(c: Collection<E>)
 	fun genericIterator(): MutableIterator<E>
 }
+
+val PrimitiveCollection<*>.indices: IntRange
+	get() = 0 until size

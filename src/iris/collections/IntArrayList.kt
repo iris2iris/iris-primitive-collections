@@ -14,29 +14,35 @@ import kotlin.math.min
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArrayList? = null) : IntList, PrimitiveAbstractList<Int>() {
+class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY) : IntList, PrimitiveAbstractList<Int>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
 		const val MAX_ARRAY_LENGTH = Int.MAX_VALUE - 8
-		private val EMPTY_ELEMENTDATA = IntArray(0)
+		private val EMPTY_ELEMENT_DATA = IntArray(0)
+
+		val emptyList = IntArrayList(0)
 	}
 
-	constructor(init: IntArrayList): this(init.size, init)
+	constructor(init: IntArrayList): this(init.size) {
+		addAll(init)
+	}
 	constructor(init: Collection<Int>): this(max(DEFAULT_CAPACITY, init.size)) {
 		addAll(init)
+	}
+
+	constructor(init: IntArray): this(init.size) {
+		init.copyInto(elementData)
+		size = init.size
 	}
 
 	private var elementData: IntArray
 
 	init {
-		val initialCapacity = max(initialCapacity, collection?.size ?: DEFAULT_CAPACITY)
-		when {
-			initialCapacity > 0 -> {
-				elementData = IntArray(initialCapacity)
-				collection?.run(::addAll)
-			}
-			initialCapacity == 0 -> elementData = EMPTY_ELEMENTDATA
+		//val initialCapacity = max(initialCapacity, DEFAULT_CAPACITY)
+		elementData = when {
+			initialCapacity > 0 -> IntArray(max(initialCapacity, DEFAULT_CAPACITY))
+			initialCapacity == 0 -> EMPTY_ELEMENT_DATA
 			else -> throw IllegalArgumentException("Illegal Capacity: $initialCapacity")
 		}
 	}
@@ -51,7 +57,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	 */
 	override fun trimToSize() {
 		if (size < elementData.size) {
-			elementData = if (size == 0) EMPTY_ELEMENTDATA else elementData.copyOf(size)
+			elementData = if (size == 0) EMPTY_ELEMENT_DATA else elementData.copyOf(size)
 		}
 	}
 
@@ -105,8 +111,20 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 		return indexOf(o) >= 0
 	}
 
+	override fun containsAll(c: IntCollection): Boolean {
+		return any { c.contains(it) }
+	}
+
 	override fun containsAll(c: Collection<Int>): Boolean {
 		return c.all(::contains)
+	}
+
+	override fun containsAny(c: IntCollection): Boolean {
+		return any { c.contains(it) }
+	}
+
+	override fun containsAny(c: Collection<Int>): Boolean {
+		return c.any(::contains)
 	}
 
 	/**
@@ -350,8 +368,8 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	}
 
 	override fun addAll(c: Collection<Int>) {
-		val a = c.toIntArray()
-		val numNew = a.size
+		addAll(c.toIntArray())
+		/*val numNew = a.size
 		if (numNew == 0) return
 		var elementData: IntArray
 		val s: Int
@@ -362,7 +380,7 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 			elementData[size + i] = a[i]
 		}
 		size = s + numNew
-		return
+		return*/
 	}
 
 	operator fun plusAssign(c: IntArrayList) {
@@ -610,23 +628,26 @@ class IntArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: IntArray
 	/**
 	 * @throws NullPointerException {@inheritDoc}
 	 */
-	override fun forEach(action: (e: Int) -> Unit) {
-		val es = elementData
-		val size = size
-		var i = 0
-		while (i < size) {
-			action(es[i])
-			i++
+	override fun forEach(action: IntCollection.IntAction) {
+		val data = elementData
+		for (i in 0 until size) {
+			action.invoke(data[i])
 		}
 	}
 
-	override fun forEachIndexed(action: (index: Int, e: Int) -> Unit) {
-		val es = elementData
-		val size = size
-		var i = 0
-		while (i < size) {
-			action(i, es[i])
-			i++
+	override fun forEachUntil(action: IntCollection.IntActionUntil) {
+		val data = elementData
+		for (i in 0 until size) {
+			if (!action.invoke(data[i]))
+				break
+		}
+	}
+
+	override fun forEachIndexed(action: IntCollection.IntActionIndexed) {
+		val data = elementData
+		for (i in 0 until size) {
+			if (!action.invoke(i, data[i]))
+				break
 		}
 	}
 

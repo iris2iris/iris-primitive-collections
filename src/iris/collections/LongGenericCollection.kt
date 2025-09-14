@@ -1,5 +1,7 @@
 package iris.collections
 
+import java.lang.Appendable
+
 open class LongGenericCollection(protected val collection: LongCollection) : MutableCollection<Long> {
 	override val size: Int
 		get() = collection.size
@@ -47,5 +49,13 @@ open class LongGenericCollection(protected val collection: LongCollection) : Mut
 
 	override fun retainAll(elements: Collection<Long>): Boolean {
 		TODO("Not yet implemented")
+	}
+
+	fun joinToString(separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: LongCollection.LongTransform? = null): String {
+		return collection.joinToString(separator, prefix, postfix, limit, truncated, transform)
+	}
+
+	fun <A: Appendable>joinTo(buffer: A, separator: CharSequence = ", ", prefix: CharSequence = "", postfix: CharSequence = "", limit: Int = -1, truncated: CharSequence = "...", transform: LongCollection.LongTransform? = null): A {
+		return collection.joinTo(buffer, separator, prefix, postfix, limit, truncated, transform)
 	}
 }

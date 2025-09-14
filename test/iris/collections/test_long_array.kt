@@ -7,8 +7,10 @@ package iris.collections
 object LongTest {
 	@JvmStatic
 	fun main(args: Array<String>) {
-		test()
-		mapTo()
+		val t = LongArrayList(longArrayOf(1, 2))
+		println(t)
+		/*test()
+		mapTo()*/
 	}
 
 	fun test() {
@@ -34,6 +36,7 @@ object LongTest {
 		println(arr)
 		arr.forEach {
 			println(it)
+			true
 		}
 	}
 }

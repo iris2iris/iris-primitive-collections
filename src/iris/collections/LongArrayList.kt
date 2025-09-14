@@ -1,42 +1,50 @@
 package iris.collections
 
 import java.io.*
-import java.lang.Appendable
 import java.util.*
 import java.util.function.Consumer
 import java.util.function.LongConsumer
 import java.util.function.LongPredicate
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.text.Appendable
 
 /**
  * @created 15.03.2022
  * @author [Ivan Ivanov](https://t.me/irisism)
  */
 @Suppress("MemberVisibilityCanBePrivate", "unused")
-class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArrayList? = null) : LongList, PrimitiveAbstractList<Long>() {
+class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY) : LongList, PrimitiveAbstractList<Long>() {
 
 	companion object {
 		private const val DEFAULT_CAPACITY = 10
 		const val MAX_ARRAY_LENGTH = Int.MAX_VALUE - 8
 		private val EMPTY_ELEMENTDATA = LongArray(0)
+		val emptyList = LongArrayList(0)
 	}
 
-	constructor(init: LongArrayList): this(init.size, init)
-	constructor(init: Collection<Long>): this(max(DEFAULT_CAPACITY, init.size)) {
+	constructor(init: LongArrayList): this(init.size) {
+		addAll(init)
+	}
+	constructor(init: Collection<Long>): this(init.size) {
+		addAll(init)
+	}
+	constructor(init: LongArray): this(init.size) {
+		init.copyInto(elementData)
+		size = init.size
+	}
+
+	constructor(init: LongCollection): this(init.size) {
 		addAll(init)
 	}
 
 	private var elementData: LongArray
 
 	init {
-		val initialCapacity = max(initialCapacity, collection?.size ?: DEFAULT_CAPACITY)
-		when {
-			initialCapacity > 0 -> {
-				elementData = LongArray(initialCapacity)
-				collection?.run(::addAll)
-			}
-			initialCapacity == 0 -> elementData = EMPTY_ELEMENTDATA
+		//val initialCapacity = max(initialCapacity, DEFAULT_CAPACITY)
+		elementData = when {
+			initialCapacity > 0 -> LongArray(max(initialCapacity, DEFAULT_CAPACITY))
+			initialCapacity == 0 -> EMPTY_ELEMENTDATA
 			else -> throw IllegalArgumentException("Illegal Capacity: $initialCapacity")
 		}
 	}
@@ -105,8 +113,32 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return indexOf(o) >= 0
 	}
 
+	override fun containsAll(c: LongCollection): Boolean {
+		var res = true
+		c.forEachUntil {
+			if (!contains(it))
+				res = false
+			res
+		}
+		return res
+	}
+
 	override fun containsAll(c: Collection<Long>): Boolean {
 		return c.all(::contains)
+	}
+
+	override fun containsAny(c: LongCollection): Boolean {
+		var notFound = true
+		c.forEachUntil {
+			if (contains(it))
+				notFound = false
+			notFound
+		}
+		return !notFound
+	}
+
+	override fun containsAny(c: Collection<Long>): Boolean {
+		return c.any(::contains)
 	}
 
 	/**
@@ -351,7 +383,8 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 
 	override fun addAll(c: Collection<Long>) {
 		val a = c.toLongArray()
-		val numNew = a.size
+		addAll(a)
+		/*val numNew = a.size
 		if (numNew == 0) return
 		var elementData: LongArray
 		val s: Int
@@ -362,7 +395,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 			elementData[size + i] = a[i]
 		}
 		size = s + numNew
-		return
+		return*/
 	}
 
 	operator fun plusAssign(c: LongArrayList) {
@@ -518,6 +551,10 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return LongArrayIterator()
 	}
 
+	override fun subList(start: Int, end: Int): LongCollection {
+		return LongSublist(this, start, end)
+	}
+
 	inner class LongArrayIterator : LongCollection.LongIterator {
 		var cursor = 0
 		var lastRet = -1
@@ -614,26 +651,26 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		}
 	}
 
-	/**
-	 * @throws NullPointerException {@inheritDoc}
-	 */
-	override fun forEach(action: (e: Long) -> Unit) {
-		val es = elementData
-		val size = size
-		var i = 0
-		while (i < size) {
-			action(es[i])
-			i++
+	override fun forEachIndexed(action: LongCollection.LongActionIndexed) {
+		val data = elementData
+		for (i in 0 until size) {
+			if (!action.invoke(i, data[i]))
+				break
 		}
 	}
 
-	override fun forEachIndexed(action: (index: Int, e: Long) -> Unit) {
-		val es = elementData
-		val size = size
-		var i = 0
-		while (i < size) {
-			action(i, es[i])
-			i++
+	override fun forEach(action: LongCollection.LongAction) {
+		val data = elementData
+		for (i in 0 until size) {
+			action.invoke(data[i])
+		}
+	}
+
+	override fun forEachUntil(action: LongCollection.LongActionUntil) {
+		val data = elementData
+		for (i in 0 until size) {
+			if (!action.invoke(data[i]))
+				break
 		}
 	}
 
@@ -725,8 +762,8 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 	}
 
 	override fun <A: Appendable>joinTo(buffer: A, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): A {
-		if (buffer is StringBuilder)
-			return joinTo(buffer, separator, prefix, postfix, limit, truncated, transform) as A
+		/*if (buffer is StringBuilder)
+			return joinTo(buffer, separator, prefix, postfix, limit, truncated, transform) as A*/
 
 		buffer.append(prefix)
 		var count = 0
@@ -742,7 +779,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		return buffer
 	}
 
-	override fun joinTo(buffer: StringBuilder, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): StringBuilder {
+	/*override fun joinTo(buffer: StringBuilder, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): StringBuilder {
 		buffer.append(prefix)
 		var count = 0
 		for (i in 0 until size) {
@@ -755,7 +792,7 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		if (limit >= 0 && count > limit) buffer.append(truncated)
 		buffer.append(postfix)
 		return buffer
-	}
+	}*/
 
 	private fun appendElement(buffer: StringBuilder, element: Long, transform: LongCollection.LongTransform?) {
 		when (transform) {
@@ -768,6 +805,179 @@ class LongArrayList(initialCapacity: Int = DEFAULT_CAPACITY, collection: LongArr
 		when (transform) {
 			null -> buffer.append(element.toString())
 			else -> transform.invoke(element, buffer)
+		}
+	}
+
+	class LongSublist(private val list: LongList, private val start: Int, private val end: Int) : LongList {
+		override fun contains(o: Long): Boolean {
+			return indexOf(o) != -1
+		}
+
+		override fun containsAll(c: LongCollection): Boolean {
+			return all { c.contains(it) }
+		}
+
+		override fun containsAny(c: LongCollection): Boolean {
+			return any { c.contains(it) }
+		}
+
+		override fun containsAny(c: Collection<Long>): Boolean {
+			return any { c.contains(it) }
+		}
+
+		override fun indexOf(o: Long): Int {
+			return list.indexOfRange(o, start, end)
+		}
+
+		override fun indexOfRange(o: Long, start: Int, end: Int): Int {
+			if (start !in 0 until size)
+				throw IllegalArgumentException("start range exception")
+			if (end !in 1 .. size)
+				throw IllegalArgumentException("end range exception")
+			return list.lastIndexOfRange(o, this.start + start, this.start + end)
+		}
+
+		override fun lastIndexOf(o: Long): Int {
+			return list.lastIndexOfRange(o, start, end)
+		}
+
+		override fun lastIndexOfRange(o: Long, start: Int, end: Int): Int {
+			TODO("Not yet implemented")
+		}
+
+		override fun toArray(): LongArray {
+			TODO("Not yet implemented")
+		}
+
+		override fun toArray(a: LongArray): LongArray {
+			TODO("Not yet implemented")
+		}
+
+		override fun get(index: Int): Long {
+			val pos = index + start
+			if (pos >= end) throw IndexOutOfBoundsException("index [$index] > size [$size]")
+			return list[pos]
+		}
+
+		override fun elementAt(index: Int): Long {
+			return get(index)
+		}
+
+		override fun set(index: Int, element: Long) {
+			TODO("Not yet implemented")
+		}
+
+		override fun add(e: Long) {
+			TODO("Not yet implemented")
+		}
+
+		override fun plusAssign(e: Long) {
+			TODO("Not yet implemented")
+		}
+
+		override fun removeAt(index: Int): Long {
+			TODO("Not yet implemented")
+		}
+
+		override fun fastRemoveAt(index: Int) {
+			TODO("Not yet implemented")
+		}
+
+		override fun equalsRange(other: LongCollection, from: Int, to: Int): Boolean {
+			TODO("Not yet implemented")
+		}
+
+		override fun plusAssign(c: LongCollection) {
+			TODO("Not yet implemented")
+		}
+
+		override fun addAll(c: LongCollection) {
+			TODO("Not yet implemented")
+		}
+
+		override fun addAll(c: LongArray) {
+			TODO("Not yet implemented")
+		}
+
+		override fun iterator(): LongCollection.LongIterator {
+			TODO("Not yet implemented")
+		}
+
+		override fun subList(start: Int, end: Int): LongCollection {
+			val newStart = this.start + start
+			return LongSublist(list, newStart, newStart + (end - start))
+		}
+
+		override fun forEachIndexed(action: LongCollection.LongActionIndexed) {
+			var ind = 0
+			for (i in start until end) {
+				if (!action.invoke(ind++, list[i]))
+					return
+			}
+		}
+
+		override fun forEachUntil(action: LongCollection.LongActionUntil) {
+			for (i in start until end) {
+				if (!action.invoke(list[i]))
+					return
+			}
+		}
+
+		override fun forEach(action: LongCollection.LongAction) {
+			for (i in start until end) {
+				action.invoke(list[i])
+			}
+		}
+
+		override fun removeIf(filter: LongPredicate, i: Int, end: Int): Boolean {
+			TODO("Not yet implemented")
+		}
+
+		override fun removeIf(filter: LongPredicate): Boolean {
+			TODO("Not yet implemented")
+		}
+
+		override fun joinToString(separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): String {
+			TODO("Not yet implemented")
+		}
+
+		override fun <A : Appendable> joinTo(buffer: A, separator: CharSequence, prefix: CharSequence, postfix: CharSequence, limit: Int, truncated: CharSequence, transform: LongCollection.LongTransform?): A {
+			TODO("Not yet implemented")
+		}
+
+		override val size: Int
+			get() = end - start
+
+		override fun isEmpty(): Boolean {
+			return start == end
+		}
+
+		override fun isNotEmpty(): Boolean {
+			return start != end
+		}
+
+		override fun clone(): LongArrayList {
+			return LongArrayList(this)
+		}
+
+		override fun clear() {
+			TODO("Not yet implemented")
+		}
+
+		override fun asGeneric(): MutableCollection<Long> {
+			return LongGenericCollection(this)
+		}
+
+		override fun containsAll(c: Collection<Long>): Boolean {
+			TODO("Not yet implemented")
+		}
+
+		override fun addAll(c: Collection<Long>) {
+			TODO("Not yet implemented")
+		}
+
+		override fun genericIterator(): MutableIterator<Long> {
+			TODO("Not yet implemented")
 		}
 	}
 }
